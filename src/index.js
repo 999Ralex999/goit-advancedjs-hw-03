@@ -30,15 +30,22 @@ function initSelect(breeds) {
     data: breeds.map(breed => ({ text: breed.name, value: breed.id })),
   });
   selector.addEventListener('change', async e => {
+    catInfo.innerHTML = '';
+    loader.style.display = 'block';
     try {
       const selectedBreed = e.target.value;
       const catData = await fetchCatByBreed(selectedBreed);
+      if (!catData || catData.length === 0) {
+        throw new Error('Please, select another breed!');
+      }
       displayCatInfo(catData[0]);
     } catch (error) {
       iziToast.error({
-        message: 'Failed to load cat image. Please try again.',
+        message: error.message || 'Failed to load cat image. Please try again.',
         position: 'topRight',
       });
+    } finally {
+      loader.style.display = 'none';
     }
   });
 }
